@@ -60,26 +60,6 @@ class FasterCropAlignXRay:
             return transformed_landmarks68, transformed_images
         else:
             return transformed_landmarks68
-    
-    def only_image(self, detect_lm5, frames, jitter=False):
-        image_sizes = np.array([x.shape[:2] for x in frames])
-        size = image_sizes.max(0)
-        h, w = size
-        five_landmarks = np.array(detect_lm5)
-        landmark_for_estimiate = five_landmarks.copy()
-        if jitter:
-            landmark_for_estimiate += np.random.uniform(
-                -4, 4, landmark_for_estimiate.shape
-            )
-        tfm, trans = estimiate_batch_transform(
-            landmark_for_estimiate, tgt_pts=self.std_points
-        )
-        transformed_images = [
-                self.process_sinlge(tfm, image, (0,0), h, w)
-                for image in frames]
-        transformed_images = np.stack(transformed_images)
-        
-        return transformed_images
 
 
     def retinaface(self, five_landmarks, ori_boxes, images, jitter=False):
@@ -89,12 +69,10 @@ class FasterCropAlignXRay:
 
         size = right_bottom - left_top
 
-        h, w = size
+        w, h = size
         
         diff = ori_boxes[:, :2] - left_top[None, ...]
 
-        
-        
         new_five_landmarks = five_landmarks + diff[:, None, :]
 
         landmark_for_estimiate = new_five_landmarks.copy()
@@ -124,8 +102,8 @@ class FasterCropAlignXRay:
         new_image = np.zeros((h, w, 3), dtype=np.uint8)
         x, y = d
         ih, iw, _ = image.shape
-        new_image[x : x + ih, y : y + iw] = image
-        # new_image[y : y + ih, x : x + iw] = image
+        new_image[y : y + ih, x : x + iw] = image
+        # cv2.imwrite('./pics/new_image.png', new_image)
         transformed_image = cv2.warpAffine(
             new_image, tfm, (self.image_size, self.image_size)
         )

@@ -63,6 +63,7 @@ class FasterCropAlignXRay:
 
 
     def retinaface(self, five_landmarks, ori_boxes, images, jitter=False):
+        # print(ori_boxes)
         left_top = ori_boxes[:, :2].min(0)
 
         right_bottom = ori_boxes[:, 2:].max(0)

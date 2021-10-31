@@ -16,6 +16,10 @@ def align(frames, jsons, size):
         org_bbox = data['ori_coordinate']
         big_bbox = data['coordinates']
         x1, y1, x2, y2 = org_bbox
+        
+        x1 = max(x1, 0)
+        y1 = max(y1, 0)
+        
         w = x2-x1
         h = y2-y1
         new_x1 = x1 - int(w*((size-1)/2))
@@ -38,8 +42,23 @@ def align(frames, jsons, size):
             new_lm5 = []
             
             for j in range(5):
-                # new_lm5.append(np.asarray([lm5[j*2+1] - new_x1, lm5[j*2] - new_y1]))
+                # 这种情况是对的
+                # print(np.asarray([lm5[j*2] - big_bbox[1], lm5[j*2+1] - big_bbox[0]]))
                 new_lm5.append(np.asarray([lm5[j*2] - new_y1, lm5[j*2+1] - new_x1]))
+                # [57 65]
+                # [86 63]
+                # [71 81]
+                # [61 95]
+                # [85 93]
+                # 在原始的代码中的结果是
+                # [[56.850048, 66.091324],
+                # [84.83173 , 64.05539 ],
+                # [70.842224, 81.82417 ],
+                # [61.36377 , 95.456154],
+                # [84.85769 , 93.667595]]
+                # 结果对上了
+                # new_lm5.append(np.asarray([lm5[j*2+1] - new_x1, lm5[j*2] - new_y1])) # 错的 错的 错的
+                
             
             lm5s.append(new_lm5)
             face_image = frames[i][com_new_y1:com_new_y2,com_new_x1:com_new_x2]
@@ -102,28 +121,31 @@ if __name__ == "__main__":
     # 结果：1.5倍 一共752189 可行677691 不行74498
     # 1.3倍 752189 706129 46060
 
-    # image1 = cv2.imread('/data/fanglingfei/dataset/Celeb-DF_consecutive_retina_face/Celeb-synthesis/id8_id2_0007/id8_id2_0007_280.png')
-    # json1 = json.load(open('/data/fanglingfei/dataset/Celeb-DF_consecutive_retina_face/Celeb-synthesis/id8_id2_0007/id8_id2_0007_280.json', 'r'))
+    image1 = cv2.imread('/data/fanglingfei/dataset/Celeb-DF_consecutive_retina_face/Celeb-synthesis/id8_id2_0007/id8_id2_0007_280.png')
+    json1 = json.load(open('/data/fanglingfei/dataset/Celeb-DF_consecutive_retina_face/Celeb-synthesis/id8_id2_0007/id8_id2_0007_280.json', 'r'))
 
+    # image1 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/original_sequences/actors/c23/videos/20__kitchen_pan/20__kitchen_pan_20.png')
+    # json1 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/original_sequences/actors/c23/videos/20__kitchen_pan/20__kitchen_pan_20.json', 'r'))
+    # print(json1)
     # cv2.imwrite('./pics/ori.png', image1)
-    image1 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_424.png')
-    image2 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_425.png')
-    image3 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_426.png')
-    image4 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_427.png')
+    # image1 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_424.png')
+    # image2 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_425.png')
+    # image3 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_426.png')
+    # image4 = cv2.imread('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_427.png')
 
-    json1 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_424.json', 'r'))
-    json2 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_425.json', 'r'))
-    json3 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_426.json', 'r'))
-    json4 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_427.json', 'r'))
+    # json1 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_424.json', 'r'))
+    # json2 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_425.json', 'r'))
+    # json3 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_426.json', 'r'))
+    # json4 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_427.json', 'r'))
 
     size = 1.3
 
-    frames = [image1, image2, image3, image4]
-    jsons = [json1, json2, json3, json4]
+    # frames = [image1, image2, image3, image4]
+    # jsons = [json1, json2, json3, json4]
 
-    # frames = [image1]
-    # jsons = [json1]
+    frames = [image1]
+    jsons = [json1]
     
     images = align(frames, jsons, size)
-    # image = images[0]
-    # cv2.imwrite('./pics/test.png', image)
+    image = images[0]
+    cv2.imwrite('./pics/test.png', image)

@@ -96,7 +96,25 @@ class FasterCropAlignXRay:
 
         return transformed_images        
         
-
+    def only_image(self, detect_lm5, frames, jitter=False):
+        image_sizes = np.array([x.shape[:2] for x in frames])
+        size = image_sizes.max(0)
+        w, h = size
+        five_landmarks = np.array(detect_lm5)
+        landmark_for_estimiate = five_landmarks.copy()
+        if jitter:
+            landmark_for_estimiate += np.random.uniform(
+                -4, 4, landmark_for_estimiate.shape
+            )
+        tfm, trans = estimiate_batch_transform(
+            landmark_for_estimiate, tgt_pts=self.std_points
+        )
+        transformed_images = [
+                self.process_sinlge(tfm, image, (0,0), h, w)
+                for image in frames]
+        transformed_images = np.stack(transformed_images)
+        
+        return transformed_images
 
     def process_sinlge(self, tfm, image, d, h, w):
         assert isinstance(image, np.ndarray)
@@ -105,7 +123,9 @@ class FasterCropAlignXRay:
         ih, iw, _ = image.shape
         new_image[y : y + ih, x : x + iw] = image
         # cv2.imwrite('./pics/new_image.png', new_image)
+        # new_image = cv2.imread('./pics/new_image8.png')
         transformed_image = cv2.warpAffine(
             new_image, tfm, (self.image_size, self.image_size)
         )
+        # cv2.imwrite('./pics/transformed_image.png', transformed_image)
         return transformed_image

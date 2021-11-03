@@ -111,52 +111,13 @@ def findAllFile(base):
 
 
 
-
-if __name__ == "__main__":
-    # 首先测试有多少可行
-    size = 1.3
-    # yes = 0
-    # no = 0
-    # all_file = []
-    # for file in findAllFile('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/'):
-    #     if file[-4:] == 'json':
-    #         all_file.append(file)
-    # print(len(all_file))
-    # for file in tqdm(all_file):
-    #     if check(file, size):
-    #         yes += 1
-    #     else:
-    #         no += 1
-    # print(yes)
-    # print(no)
-    # 结果：1.5倍 一共752189 可行677691 不行74498
-    # 1.3倍 752189 706129 46060
-
-    # # 检查连续四帧的可行性
-    # total = 0
-    # yes = 0
-    # no = 0
-    # with open('/data/fanglingfei/workspace/universal5/data/faceforensics_c23_consecutive_faces_4_wza236/train_annotations/faceforensics_c23_train.txt', 'r') as f:
-    #     for line in tqdm(f.readlines()):
-    #         total += 1
-    #         image1, image2, image3, image4, label = line.split()
-    #         json1 = image1.replace('.png', '.json')
-    #         json2 = image2.replace('.png', '.json')
-    #         json3 = image3.replace('.png', '.json')
-    #         json4 = image4.replace('.png', '.json')
-    #         if check(json1) and check(json2) and check(json3) and check(json4):
-    #             yes += 1
-    #         else:
-    #             no +=1
-    # print(total, yes, no)
-    # # 142282 132834 9448
-
-    # 直接检查
+def do_for_txt_list(infile, outfile, size):
     total = 0
     yes = 0
     no = 0
-    fout = open('new.txt', 'w')
-    with open('/data/fanglingfei/workspace/universal5/data/faceforensics_c23_consecutive_faces_4_wza236/train_annotations/faceforensics_c23_train.txt', 'r') as f:
+    fout = open(outfile, 'w')
+    # /data/fanglingfei/workspace/universal5/data/faceforensics_c23_consecutive_faces_4_wza236/train_annotations/faceforensics_c23_train.txt
+    with open(infile, 'r') as f:
         for line in tqdm(f.readlines()):
             total += 1
             image1_path, image2_path, image3_path, image4_path, label = line.split()
@@ -194,7 +155,67 @@ if __name__ == "__main__":
                 yes += 1
             else:
                 no +=1
+    fout.close()
     print(total, yes, no)
+
+
+if __name__ == "__main__":
+    # 首先测试有多少可行
+    size = 1.3
+    files = [
+        '/data/fanglingfei/workspace/universal5/data/faceforensics_c23_consecutive_faces_4_wza236/train_annotations/faceforensics_c23_train.txt'
+        '/data/fanglingfei/workspace/universal5/data_celebdf/celebdf_consecutive_faces_4_wza236/test_annotations/celebdf_test.txt',
+        '/data/fanglingfei/workspace/universal5/data_celebdf/celebdf_consecutive_faces_4_wza236/train_annotations/celebdf_train.txt'
+        '/data/fanglingfei/workspace/universal5/data_ff/faceforensics_c23_consecutive_faces_4_wza236_official/test_annotations/faceforensics_all_c23_test.txt',
+        '/data/fanglingfei/workspace/universal5/data_ff/faceforensics_c23_consecutive_faces_4_wza236_official/train_annotations/faceforensics_all_c23_train.txt',
+        '/data/fanglingfei/workspace/universal5/data_ff/faceforensics_c23_consecutive_faces_4_wza236_official/val_annotations/faceforensics_all_c23_val.txt',
+    ]
+    for file in files:
+        outfile = file.split('/')[-1]
+        do_for_txt_list(file, outfile, size)
+
+
+
+
+
+    # yes = 0
+    # no = 0
+    # all_file = []
+    # for file in findAllFile('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/'):
+    #     if file[-4:] == 'json':
+    #         all_file.append(file)
+    # print(len(all_file))
+    # for file in tqdm(all_file):
+    #     if check(file, size):
+    #         yes += 1
+    #     else:
+    #         no += 1
+    # print(yes)
+    # print(no)
+    # 结果：1.5倍 一共752189 可行677691 不行74498
+    # 1.3倍 752189 706129 46060
+
+    # # 检查连续四帧的可行性
+    # total = 0
+    # yes = 0
+    # no = 0
+    # with open('/data/fanglingfei/workspace/universal5/data/faceforensics_c23_consecutive_faces_4_wza236/train_annotations/faceforensics_c23_train.txt', 'r') as f:
+    #     for line in tqdm(f.readlines()):
+    #         total += 1
+    #         image1, image2, image3, image4, label = line.split()
+    #         json1 = image1.replace('.png', '.json')
+    #         json2 = image2.replace('.png', '.json')
+    #         json3 = image3.replace('.png', '.json')
+    #         json4 = image4.replace('.png', '.json')
+    #         if check(json1) and check(json2) and check(json3) and check(json4):
+    #             yes += 1
+    #         else:
+    #             no +=1
+    # print(total, yes, no)
+    # # 142282 132834 9448
+
+    # 直接检查
+
     # 结果也是 142282 132938 9344 说明可行
 
 

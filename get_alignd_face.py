@@ -155,18 +155,19 @@ if __name__ == "__main__":
     total = 0
     yes = 0
     no = 0
+    fout = open('new.txt', 'w')
     with open('/data/fanglingfei/workspace/universal5/data/faceforensics_c23_consecutive_faces_4_wza236/train_annotations/faceforensics_c23_train.txt', 'r') as f:
         for line in tqdm(f.readlines()):
             total += 1
-            image1, image2, image3, image4, label = line.split()
-            json1 = image1.replace('.png', '.json')
-            json2 = image2.replace('.png', '.json')
-            json3 = image3.replace('.png', '.json')
-            json4 = image4.replace('.png', '.json')
-            image1 = cv2.imread(image1)
-            image2 = cv2.imread(image2)
-            image3 = cv2.imread(image3)
-            image4 = cv2.imread(image4)
+            image1_path, image2_path, image3_path, image4_path, label = line.split()
+            json1 = image1_path.replace('.png', '.json')
+            json2 = image2_path.replace('.png', '.json')
+            json3 = image3_path.replace('.png', '.json')
+            json4 = image4_path.replace('.png', '.json')
+            image1 = cv2.imread(image1_path)
+            image2 = cv2.imread(image2_path)
+            image3 = cv2.imread(image3_path)
+            image4 = cv2.imread(image4_path)
             json1 = json.load(open(json1, 'r'))
             json2 = json.load(open(json2, 'r'))
             json3 = json.load(open(json3, 'r'))
@@ -175,6 +176,20 @@ if __name__ == "__main__":
             frames = [image1, image2, image3, image4]
             jsons = [json1, json2, json3, json4]
             res, img = align(frames, jsons, size)
+            new_image_path1 = image1_path.replace('VideoData', 'AlignData')
+            new_image_path2 = image2_path.replace('VideoData', 'AlignData')
+            new_image_path3 = image3_path.replace('VideoData', 'AlignData')
+            new_image_path4 = image4_path.replace('VideoData', 'AlignData')
+            image_path = [image1_path, image2_path, image3_path, image4_path]
+            if res:
+                for i in range(4):
+                    old_name = image_path[i]
+                    out_name = old_name.replace('VideoData', 'AlignData')
+                    out_path = out_name.replace(out_name.split('/')[-1], '')
+                    os.makedirs(out_path, exist_ok=True)
+                    cv2.imwrite(out_name, img[i])
+                    fout.write(out_name + ' ')
+                fout.write(label + '\n')
             if res:
                 yes += 1
             else:
@@ -214,13 +229,13 @@ if __name__ == "__main__":
     # json3 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_2.json', 'r'))
     # json4 = json.load(open('/data/fanglingfei/dataset/faceforensics_c23_consecutive_retina_face/VideoData/manipulated_sequences/Deepfakes/c23/videos/412_274/412_274_3.json', 'r'))
 
-    # size = 1.3
+    # size = 1.0
 
     # frames = [image1, image2, image3, image4]
     # jsons = [json1, json2, json3, json4]
 
-    # # frames = [image1]
-    # # jsons = [json1]
+    # # # frames = [image1]
+    # # # jsons = [json1]
     
     # res, images = align(frames, jsons, size)
     # print(res)
